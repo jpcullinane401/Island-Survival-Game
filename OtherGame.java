@@ -63,6 +63,7 @@ public class OtherGame {
 	static boolean battle = false;
 	static boolean pTurn = true;
 	static boolean eTurn = false;
+	static boolean userChoicePending;
 	
 	static Scanner keyboard = new Scanner(System.in);
 	static Random random = new Random();
@@ -108,7 +109,17 @@ public class OtherGame {
 				System.out.println("2. Block");
 				System.out.println("3. Run");
 				System.out.println("4. Item");
-				userResponse = keyboard.nextInt();
+				userChoicePending = true;
+				while (userChoicePending) {
+					try {
+						userResponse = keyboard.nextInt();
+						userChoicePending = false;
+					}
+					catch (java.util.InputMismatchException ime) {
+						System.out.println("Please type the number that represents the action you would like to perform.");
+						keyboard.nextLine();
+					}
+				}
 				line();
 				switch (userResponse) {
 				// player attacks 
@@ -323,7 +334,17 @@ public class OtherGame {
 			inventory[0] = items[rng];
 		} else {
 			System.out.println("Do you want to replace your current item? (" + inventory[0] + ") (1y/2n)");
-			userResponse = keyboard.nextInt();
+			userChoicePending = true;
+			while (userChoicePending) {
+				try {
+					userResponse = keyboard.nextInt();
+					userChoicePending = false;
+				}
+				catch (java.util.InputMismatchException ime) {
+					System.out.println("Please type the number that represents the action you would like to perform.");
+					keyboard.nextLine();
+				}
+			}
 			if (userResponse == 1) {
 				inventory[0] = items[rng];
 			} else {

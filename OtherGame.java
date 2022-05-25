@@ -41,7 +41,7 @@ public class OtherGame {
 	static boolean landi = false;
 	static boolean hook = false;
 	static boolean spiky;
-	
+	static boolean userChoicePending;
 	
 	static boolean fightWin = false;
 	static boolean pBlock = false;
@@ -79,14 +79,14 @@ public class OtherGame {
 	public static void main(String[] args) {
 		
 		System.out.println("Would you like to choose a starting item? (1y/2n)");
-		startingOption = keyboard.nextInt();
+		startingOption = promptForInt();
 		if (startingOption == 1) {
 			System.out.println("What would you like?");
 			System.out.println("1. Small HP Potion");
 			System.out.println("2. Glasses");
 			System.out.println("3. Bladed Glove");
 			System.out.println("4. Grappling Hook");
-			startingOption = keyboard.nextInt();
+			startingOption = promptForInt();
 			if (startingOption == 1) {
 				inventory[0] = items[0];
 				System.out.println("You got a Small HP Potion");
@@ -161,7 +161,7 @@ public class OtherGame {
 				System.out.println("3. Run");
 				System.out.println("4. Item");
 				System.out.println("5. Pray");
-				userResponse = keyboard.nextInt();
+				userResponse = promptForInt();
 				line();
 				switch (userResponse) {
 				// player attacks 
@@ -523,6 +523,22 @@ public class OtherGame {
 	public static void line() { 
 		System.out.println("--------------------------");		
 	}
+
+	public static int promptForInt() {
+		int returnValue = 0;
+		userChoicePending = true;
+		while (userChoicePending) {
+			try {
+				returnValue = keyboard.nextInt();
+				userChoicePending = false;
+			}
+			catch (java.util.InputMismatchException ime) {
+				System.out.println("Please type the number that corresponds with the action you would like to perform.");
+				keyboard.nextLine();
+			}
+		}
+		return returnValue;
+	}
 	
 	public static void expMachine() {
 		
@@ -555,7 +571,7 @@ public class OtherGame {
 			inventory[0] = items[rng];
 		} else {
 			System.out.println("Do you want to replace your current item? (" + inventory[0] + ") (1y/2n)");
-			userResponse = keyboard.nextInt();
+			userResponse = promptForInt();
 			if (userResponse == 1) {
 				inventory[0] = items[rng];
 			} else {

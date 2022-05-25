@@ -12,31 +12,23 @@ public class OtherGame {
 	static int rng;
 	static int userChoice;
 	
-	static int areaRng;
-	
-	
+	static int areaRn;
 	static int playerHPmax = 100;
 	static int playerHP = playerHPmax;
 	
 	static int internalSector = 0;
 	static int sector = 0;
-	
+	static int areaRng;
 	static int playerAtk = 10;
 	static int playerDef = 5;
-	
-	//
 	static int playerLevel = 1;
 	static int playerExp = 0;
 	static int expToNext = 0;
-	
-	
 	static int enemyRNG;
 	static int enemyID;
 	static int missChance;
 	static int dmgRNG;
 	static int damage;
-	
-	
 	static int expCap;
 	static int expLvl;
 	static int expLeft;
@@ -54,7 +46,8 @@ public class OtherGame {
 	
 	// Determines the name of the area, every 10 floors the player reaches a new area
 	
-	static String[] areaNames = {"Thicket", "Tropics", "Deep Woods", "Mountain" };
+	static String[] items = {"Winged Boots", "Glasses", "Bladed Glove", "Grappling Hook", "HP Potion" };
+	static String[] inventory = {""};
 	static String area;
 	
 	// static int woodSupply = 0;
@@ -103,13 +96,20 @@ public class OtherGame {
 			if (playerHP <= 0) {
 				System.out.println("You died.");
 				gaming = false;
+				System.exit(0);
 			}
 			while (pTurn == true && eTurn == false && battle == true) {
 				pBlock = false;
+				System.out.println("Your HP: "+playerHP + "/"+playerHPmax);
+				System.out.println("Inventory: "+inventory[0]);
+				System.out.println("Level: " + playerLevel);
+				System.out.println("EXP: "+ expAmt + "/" + expCap);
 				System.out.println("1. Attack");
 				System.out.println("2. Block");
 				System.out.println("3. Run");
+				System.out.println("4. Item");
 				userResponse = keyboard.nextInt();
+				line();
 				switch (userResponse) {
 				// player attacks 
 				case 1: 
@@ -130,7 +130,6 @@ public class OtherGame {
 							fightWin = true;
 							battle = false;
 							System.out.println("You gained " + expDrop + " experience points.");
-							System.out.println(expLeft + " experience points til next lvl up");
 							expAmt = expAmt + expDrop;
 							break;
 						}
@@ -176,6 +175,11 @@ public class OtherGame {
 					
 					break;
 					
+					
+					
+					
+				case 4:
+					break;
 					
 					
 					}
@@ -265,7 +269,7 @@ public class OtherGame {
 	
 	public static void forestEvent() {
 		System.out.println("Forest " + sector);
-		areaRng = random.nextInt(10);
+		areaRng = random.nextInt(11);
 		if (areaRng < 5) {
 			battle("Hot Pepper Snail", 25, 10, 1, 25);
 		} else if (areaRng > 5 && areaRng < 10) {
@@ -273,9 +277,12 @@ public class OtherGame {
 		} else if (areaRng == 5) {
 			System.out.println("You found a hot spring in a forest clearing.");
 			System.out.println("The warm water nourishes your soul. Full HP!");
+			line();
 			playerHP = playerHPmax;
-		} else if (areaRng == 10) {
+		} else if (areaRng >= 10) {
 			System.out.println("You found a treasure chest.");
+			loot();
+			line();
 			
 		}
 		
@@ -301,8 +308,29 @@ public class OtherGame {
 	
 	public static void levelUp() {
 		System.out.println("Wow! Level up!");
+		line();
 		playerAtk = playerAtk + 5;
 		playerHPmax = playerHPmax + 10;
+		playerHP = playerHPmax;
+	}
+	
+	public static void loot() {
+		rng = random.nextInt(4);
+		System.out.println("You found a " + items[rng]);
+		
+		if (inventory[0].isEmpty()) {
+			System.out.println("You have a " + items[rng] + " in your inventory now");
+			inventory[0] = items[rng];
+		} else {
+			System.out.println("Do you want to replace your current item? (" + inventory[0] + ") (1y/2n)");
+			userResponse = keyboard.nextInt();
+			if (userResponse == 1) {
+				inventory[0] = items[rng];
+			} else {
+				System.out.println("You tossed away the "+ items[rng]);
+			}
+		}
+		
 	}
 	
 	

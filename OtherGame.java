@@ -34,7 +34,10 @@ public class OtherGame {
 	static int expLeft;
 	static int expAmt = 0;
 	
+	static boolean glove = false;
+	static boolean glasses = false;
 	static boolean landi = false;
+	static boolean hook = false;
 	
 	
 	static boolean fightWin = false;
@@ -46,7 +49,7 @@ public class OtherGame {
 	
 	// Determines the name of the area, every 10 floors the player reaches a new area
 	
-	static String[] items = {"Winged Boots", "Glasses", "Bladed Glove", "Grappling Hook", "HP Potion" };
+	static String[] items = {"Small HP Potion", "Glasses", "Bladed Glove", "Grappling Hook", "HP Potion" };
 	static String[] inventory = {""};
 	static String area;
 	
@@ -63,7 +66,6 @@ public class OtherGame {
 	static boolean battle = false;
 	static boolean pTurn = true;
 	static boolean eTurn = false;
-	static boolean userChoicePending;
 	
 	static Scanner keyboard = new Scanner(System.in);
 	static Random random = new Random();
@@ -73,11 +75,22 @@ public class OtherGame {
 
 	public static void main(String[] args) {
 		while (gaming == true) {
+			glasses = false;
+			glove = false;
 			expMachine();
+			getAreaName();
+			internalSector++;
 			sector++;
-			if (sector <= 10) { // FOREST
+			if (internalSector <= 10) { // FOREST
 				forestEvent();
-			} // end of forest
+			} else if (internalSector > 10 && internalSector < 20) { // THICKET
+				
+				
+			} else if (internalSector > 20 && internalSector <= 35) { // CAVE
+				
+			}
+			
+			
 		}
 	}
 	
@@ -86,6 +99,8 @@ public class OtherGame {
 		pBlock = false;
 		pTurn = true;
 		eTurn = false;
+		glasses = false;
+		glove = false;
 		wasInCombat = true;
 		System.out.println(enemyName + " attacks!");
 		
@@ -94,6 +109,9 @@ public class OtherGame {
 			line();
 			expMachine();
 			pBlock = false;
+			glove = false;
+			glasses = false;
+			hook = false;
 			if (playerHP <= 0) {
 				System.out.println("You died.");
 				gaming = false;
@@ -109,17 +127,7 @@ public class OtherGame {
 				System.out.println("2. Block");
 				System.out.println("3. Run");
 				System.out.println("4. Item");
-				userChoicePending = true;
-				while (userChoicePending) {
-					try {
-						userResponse = keyboard.nextInt();
-						userChoicePending = false;
-					}
-					catch (java.util.InputMismatchException ime) {
-						System.out.println("Please type the number that represents the action you would like to perform.");
-						keyboard.nextLine();
-					}
-				}
+				userResponse = keyboard.nextInt();
 				line();
 				switch (userResponse) {
 				// player attacks 
@@ -127,22 +135,29 @@ public class OtherGame {
 					System.out.println("You attack!");
 					pBlock = false;
 					missChance = random.nextInt(10);
+					if (glasses == true) {
+						missChance = 10;
+					}
 					if (missChance < 3) {
 						System.out.println("...but you missed.");
 						pTurn = false;
 						eTurn = true;
 						break;
 					} else {
-						damage = (playerAtk);
-						System.out.println(enemyName + " takes " + damage + " damage!");
-						enemyHP = enemyHP - damage;
-						if (enemyHP <= 0) {
-							System.out.println(enemyName + " dies.");
-							fightWin = true;
-							battle = false;
-							System.out.println("You gained " + expDrop + " experience points.");
-							expAmt = expAmt + expDrop;
-							break;
+						if (glove == true) {
+							damage = playerAtk * 2;
+						} else if (glove == false){
+							damage = (playerAtk);
+						}
+							System.out.println(enemyName + " takes " + damage + " damage!");
+							enemyHP = enemyHP - damage;
+							if (enemyHP <= 0) {
+								System.out.println(enemyName + " dies.");
+								fightWin = true;
+								battle = false;
+								System.out.println("You gained " + expDrop + " experience points.");
+								expAmt = expAmt + expDrop;
+								break;
 						}
 
 						pTurn = false;
@@ -169,7 +184,7 @@ public class OtherGame {
 						escapeOdds = random.nextInt(100);
 						if (escapeOdds > 70) {
 							System.out.println("You got away!");
-							System.out.println("You ran all the back to camp");
+							System.out.println("You ran all the way to the next area!");
 							battle = false;
 							break;
 							
@@ -190,12 +205,15 @@ public class OtherGame {
 					
 					
 				case 4:
+					if (userResponse ==4) {
+						useItem();
+					}
 					break;
 					
 					
-					}
-				
 				}
+				
+			}
 			
 				
 			
@@ -280,12 +298,12 @@ public class OtherGame {
 	
 	public static void forestEvent() {
 		System.out.println("Forest " + sector);
-		areaRng = random.nextInt(11);
-		if (areaRng < 5) {
+		areaRng = random.nextInt(13);
+		if (areaRng < 4) {
 			battle("Hot Pepper Snail", 25, 10, 1, 25);
-		} else if (areaRng > 5 && areaRng < 10) {
+		} else if (areaRng > 4 && areaRng < 10) {
 			battle("Caterpilla", 20, 10, 2, 15);
-		} else if (areaRng == 5) {
+		} else if (areaRng == 4) {
 			System.out.println("You found a hot spring in a forest clearing.");
 			System.out.println("The warm water nourishes your soul. Full HP!");
 			line();
@@ -298,6 +316,42 @@ public class OtherGame {
 		}
 		
 	}
+	
+	public static void thicketEvent() {
+		System.out.println("Thicket " + sector);
+		areaRng = random.nextInt(13);
+		if (areaRng < 4) {
+			battle("Hot Pepper Snail", 25, 10, 1, 25);
+		} else if (areaRng > 4 && areaRng < 10) {
+			battle("Caterpilla", 20, 10, 2, 15);
+		} else if (areaRng == 4) {
+			System.out.println("You found a hot spring in a forest clearing.");
+			System.out.println("The warm water nourishes your soul. Full HP!");
+			line();
+			playerHP = playerHPmax;
+		} else if (areaRng >= 10) {
+			System.out.println("You found a treasure chest.");
+			loot();
+			line();
+			
+		}
+		
+	}
+	
+	public static void caveEvent() {
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public static void line() { 
 		System.out.println("--------------------------");		
@@ -334,17 +388,7 @@ public class OtherGame {
 			inventory[0] = items[rng];
 		} else {
 			System.out.println("Do you want to replace your current item? (" + inventory[0] + ") (1y/2n)");
-			userChoicePending = true;
-			while (userChoicePending) {
-				try {
-					userResponse = keyboard.nextInt();
-					userChoicePending = false;
-				}
-				catch (java.util.InputMismatchException ime) {
-					System.out.println("Please type the number that represents the action you would like to perform.");
-					keyboard.nextLine();
-				}
-			}
+			userResponse = keyboard.nextInt();
 			if (userResponse == 1) {
 				inventory[0] = items[rng];
 			} else {
@@ -354,8 +398,52 @@ public class OtherGame {
 		
 	}
 	
+	public static void useItem() {
+		if (inventory[0].isEmpty() || inventory[0] == "") {
+			System.out.println("You do not have an item!");
+		} else if (inventory[0] == items[0]) { //Small HP Potion
+			inventory[0] = null;
+			playerHP = playerHP + 50;
+			System.out.println("You used your Small HP potion and regained 50 HP points.");
+			
+		} else if (inventory[0] == items[1]) { //Glasses
+			inventory[0] = null;
+			glasses = true;
+			System.out.println("You put on your pair of very breakable glasses.");
+			System.out.println("They increase your accuracy for the current battle!");
+			
+		} else if (inventory[0] == items[2]) { // Bladed Glove
+			inventory[0] = null;
+			glove = true;
+			System.out.println("You put on the pair of sharp gloves");
+			System.out.println("They increase your attack damage for the current battle!");
+			
+		} else if (inventory[0] == items[3]) { // Grappling Hook
+			inventory[0] = null;
+			System.out.println("You used your grappling hook to flee!");
+			hook = true;
+			battle = false;
+			rng = (random.nextInt(5)) + 1;
+			sector = sector + rng;
+			
+		} else if (inventory[0] == items[4]) { // HP Potion
+			inventory[0] = null;
+			playerHP = playerHPmax;
+			System.out.println("You used your HP potion and healed back to full HP");
+		}
+		
+		
+	}
+	
+	public static void getAreaName() {
+		
+		if (internalSector == 11) {
+			sector = 1;
+		} else if (internalSector == 21) {
+			sector = 1;
+		}
+	}
+	
+	
 	
 }
-
-
-

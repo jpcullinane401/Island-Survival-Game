@@ -15,6 +15,7 @@ public class OtherGame {
 	static int areaRn;
 	static int playerHPmax = 100;
 	static int playerHP = playerHPmax;
+	static int startingOption;
 	
 	static int internalSector = 0;
 	static int sector = 0;
@@ -33,11 +34,13 @@ public class OtherGame {
 	static int expLvl;
 	static int expLeft;
 	static int expAmt = 0;
+	static int bombbushCount;
 	
 	static boolean glove = false;
 	static boolean glasses = false;
 	static boolean landi = false;
 	static boolean hook = false;
+	static boolean spiky;
 	
 	
 	static boolean fightWin = false;
@@ -74,17 +77,46 @@ public class OtherGame {
 	
 
 	public static void main(String[] args) {
+		
+		System.out.println("Would you like to choose a starting item? (1y/2n)");
+		startingOption = keyboard.nextInt();
+		if (startingOption == 1) {
+			System.out.println("What would you like?");
+			System.out.println("1. Small HP Potion");
+			System.out.println("2. Glasses");
+			System.out.println("3. Bladed Glove");
+			System.out.println("4. Grappling Hook");
+			startingOption = keyboard.nextInt();
+			if (startingOption == 1) {
+				inventory[0] = items[0];
+				System.out.println("You got a Small HP Potion");
+			} else if (startingOption ==2 ) {
+				inventory[0] = items[1];
+				System.out.println("You got Glasses");
+			} else if (startingOption ==3) {
+				inventory[0] = items[2];
+				System.out.println("You got a Bladed Glove");
+			} else if (startingOption ==4) {
+				inventory[0] = items[3];
+				System.out.println("You got a Grappling Hook");
+			}
+		}
+		
 		while (gaming == true) {
+			
+			
+			
 			glasses = false;
 			glove = false;
 			expMachine();
 			getAreaName();
 			internalSector++;
 			sector++;
+			line();
 			if (internalSector <= 10) { // FOREST
 				forestEvent();
 			} else if (internalSector > 10 && internalSector < 20) { // THICKET
-				
+				thicketEvent();
 				
 			} else if (internalSector > 20 && internalSector <= 35) { // CAVE
 				
@@ -101,6 +133,9 @@ public class OtherGame {
 		eTurn = false;
 		glasses = false;
 		glove = false;
+		spiky = false;
+		bombbushCount = 3;
+		
 		wasInCombat = true;
 		System.out.println(enemyName + " attacks!");
 		
@@ -109,8 +144,6 @@ public class OtherGame {
 			line();
 			expMachine();
 			pBlock = false;
-			glove = false;
-			glasses = false;
 			hook = false;
 			if (playerHP <= 0) {
 				System.out.println("You died.");
@@ -127,6 +160,7 @@ public class OtherGame {
 				System.out.println("2. Block");
 				System.out.println("3. Run");
 				System.out.println("4. Item");
+				System.out.println("5. Pray");
 				userResponse = keyboard.nextInt();
 				line();
 				switch (userResponse) {
@@ -151,6 +185,11 @@ public class OtherGame {
 						}
 							System.out.println(enemyName + " takes " + damage + " damage!");
 							enemyHP = enemyHP - damage;
+							if (spiky == true) {
+								System.out.println("The enemy's spikes poke into you!");
+								System.out.println("- 5 HP");
+								playerHP = playerHP - 5;
+							}
 							if (enemyHP <= 0) {
 								System.out.println(enemyName + " dies.");
 								fightWin = true;
@@ -200,26 +239,34 @@ public class OtherGame {
 					}
 					
 					break;
-					
-					
-					
-					
+
 				case 4:
-					if (userResponse ==4) {
+		
+		if (userResponse ==4) {
 						useItem();
 					}
 					break;
 					
 					
+				case 5:
+					if (userResponse ==5) {
+						rng = random.nextInt(3);
+						if (rng == 2) {
+							System.out.println("Your prayers were answered!");
+							playerHP = playerHP + 20;
+							System.out.println("+ 20 HP");
+							capHP();
+						} else {
+							System.out.println("But nobody heard...");
+						}
+						pTurn = false;
+						eTurn = true;
+					}
+					break;
+					
 				}
 				
 			}
-			
-				
-			
-			
-				
-				
 			 // end of battle 
 			
 		
@@ -288,7 +335,117 @@ public class OtherGame {
 					pBlock = false;
 				}
 				
-		
+				// BANDIT
+				
+				if (enemyID == 4) {
+					enemyRNG = random.nextInt(12);
+					rng = random.nextInt(4);
+					if (enemyRNG < 7) {
+						System.out.println("Bandit shanked you!");
+						System.out.println("- " + ((enemyAtk *rng) + 1 ) + " HP");
+						if (pBlock = true) {
+							enemyRNG = enemyRNG / 2;
+						}
+						playerHP = playerHP - ((enemyAtk * rng) + 1);
+						System.out.println("Your HP is " + playerHP);
+
+					}
+					if (enemyRNG >= 7 && enemyRNG < 10) {
+						rng = random.nextInt(3);
+						if (inventory[0].isEmpty()) {
+							System.out.println("Bandit tried to steal your item!");
+							System.out.println("..but you don't have anything!");
+						}
+						if (rng >= 2) {
+							System.out.println("Bandit stole your " + inventory[0]);
+							inventory[0] = "";
+							
+						} else {
+							System.out.println("Bandit flashed a rude gesture.");
+						}
+						
+						
+					} else if (enemyRNG >= 10){
+						System.out.println("Bandit ate a banana.");
+						enemyHP = enemyHP + 15;
+						
+					}
+					pTurn = true;
+					eTurn = false;
+					pBlock = false;
+				}
+				
+				
+				
+				// POISON IVY STICKER
+				
+				if (enemyID == 3) {
+					enemyRNG = random.nextInt(10);
+					rng = random.nextInt(7);
+					if (enemyRNG <= 5) {
+						System.out.println("Poison Ivy Sticker spat out poison!");
+						System.out.println("- " + (enemyAtk *rng)  + " HP");
+						if (pBlock = true) {
+							enemyRNG = enemyRNG / 2;
+						}
+						playerHP = playerHP - (enemyAtk * rng);
+						System.out.println("Your HP is " + playerHP);
+						
+					} else if (enemyRNG > 5) {
+						System.out.println("Poison Ivy Sticker is sizing you up.");
+					}
+					pTurn = true;
+					eTurn = false;
+					pBlock = false;
+				}
+				
+				
+				// SPINED CATERPILLA
+				
+				if (enemyID == 5) {
+					spiky = true;
+					enemyRNG = random.nextInt(10);
+					rng = random.nextInt(4);
+					if (enemyRNG <= 7) {
+						System.out.println("Spined Caterpilla rolled into you!");
+						System.out.println("- " + (enemyAtk *rng)  + " HP");
+						if (pBlock = true) {
+							enemyRNG = enemyRNG / 2;
+						}
+						playerHP = playerHP - (enemyAtk * rng);
+						System.out.println("Your HP is " + playerHP);
+						
+					} else if (enemyRNG >7) {
+						System.out.println("Spined Caterpilla is rolling around.");
+					}
+					pTurn = true;
+					eTurn = false;
+					pBlock = false;
+				}
+				
+				
+				// BOMBBUSH
+				
+				if (enemyID == 6) {
+					if (bombbushCount != 0) {
+						System.out.println("The Bombbush counts: " + bombbushCount);
+						bombbushCount--;
+					} else {
+						System.out.println("BOMBBUSH EXPLODES!");
+						System.out.println("- " + (enemyAtk) + " HP");
+						if (pBlock = true) {
+							enemyRNG = enemyRNG / 2;
+						}
+						playerHP = playerHP - (enemyAtk);
+						System.out.println("Your HP is " + playerHP);
+						battle=false;
+					}
+					pTurn = true;
+					eTurn = false;
+					pBlock = false;
+					
+				}
+				
 			}
 		
 		
@@ -298,11 +455,13 @@ public class OtherGame {
 	
 	public static void forestEvent() {
 		System.out.println("Forest " + sector);
-		areaRng = random.nextInt(13);
+		areaRng = random.nextInt(12);
 		if (areaRng < 4) {
 			battle("Hot Pepper Snail", 25, 10, 1, 25);
-		} else if (areaRng > 4 && areaRng < 10) {
+		} else if (areaRng > 4 && areaRng < 9) {
 			battle("Caterpilla", 20, 10, 2, 15);
+		} else if (areaRng == 9) {
+			System.out.println("There is nothing here...");
 		} else if (areaRng == 4) {
 			System.out.println("You found a hot spring in a forest clearing.");
 			System.out.println("The warm water nourishes your soul. Full HP!");
@@ -319,11 +478,13 @@ public class OtherGame {
 	
 	public static void thicketEvent() {
 		System.out.println("Thicket " + sector);
-		areaRng = random.nextInt(13);
-		if (areaRng < 4) {
-			battle("Hot Pepper Snail", 25, 10, 1, 25);
-		} else if (areaRng > 4 && areaRng < 10) {
-			battle("Caterpilla", 20, 10, 2, 15);
+		areaRng = random.nextInt(12);
+		if (areaRng < 2) {
+			battle("Poison Ivy Sticker", 50, 15, 3, 30);
+			
+		} else if (areaRng > 4 && areaRng < 7) {
+			battle("Bandit", 30, 5, 4, 5);
+			
 		} else if (areaRng == 4) {
 			System.out.println("You found a hot spring in a forest clearing.");
 			System.out.println("The warm water nourishes your soul. Full HP!");
@@ -334,6 +495,12 @@ public class OtherGame {
 			loot();
 			line();
 			
+		} else if (areaRng == 2) {
+			battle("Bombbush", 40, 50, 6, 20);
+		
+		} else {
+			spiky = true;
+			battle("Spined Caterpilla", 40, 5, 5, 20);
 		}
 		
 	}
@@ -402,32 +569,37 @@ public class OtherGame {
 		if (inventory[0].isEmpty() || inventory[0] == "") {
 			System.out.println("You do not have an item!");
 		} else if (inventory[0] == items[0]) { //Small HP Potion
-			inventory[0] = null;
+			inventory[0] = "";
 			playerHP = playerHP + 50;
+			if (playerHP > playerHPmax) {
+				playerHP = playerHPmax;
+			}
 			System.out.println("You used your Small HP potion and regained 50 HP points.");
 			
 		} else if (inventory[0] == items[1]) { //Glasses
-			inventory[0] = null;
+			inventory[0] = "";
 			glasses = true;
 			System.out.println("You put on your pair of very breakable glasses.");
 			System.out.println("They increase your accuracy for the current battle!");
 			
 		} else if (inventory[0] == items[2]) { // Bladed Glove
-			inventory[0] = null;
+			inventory[0] = "";
 			glove = true;
 			System.out.println("You put on the pair of sharp gloves");
 			System.out.println("They increase your attack damage for the current battle!");
 			
 		} else if (inventory[0] == items[3]) { // Grappling Hook
-			inventory[0] = null;
+			inventory[0] = "";
 			System.out.println("You used your grappling hook to flee!");
+			System.out.println("You skipped several sectors!");
 			hook = true;
 			battle = false;
 			rng = (random.nextInt(5)) + 1;
+			
 			sector = sector + rng;
 			
 		} else if (inventory[0] == items[4]) { // HP Potion
-			inventory[0] = null;
+			inventory[0] = "";
 			playerHP = playerHPmax;
 			System.out.println("You used your HP potion and healed back to full HP");
 		}
@@ -437,11 +609,23 @@ public class OtherGame {
 	
 	public static void getAreaName() {
 		
-		if (internalSector == 11) {
-			sector = 1;
-		} else if (internalSector == 21) {
-			sector = 1;
+		if (internalSector == 10) {
+			sector = 0;
+		} else if (internalSector == 20) {
+			sector = 0;
 		}
+		
+		if (internalSector > 10) {
+			sector = 0;
+		}
+		
+	}
+	
+	public static void capHP () {
+		if(playerHP > playerHPmax) {
+			playerHP = playerHPmax;
+		}
+		
 	}
 	
 	
